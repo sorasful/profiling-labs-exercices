@@ -159,3 +159,6 @@ dmypy.json
 
 # Cython debug symbols
 cython_debug/
+
+# Output of the 1_3 scraping exercise (assets/images stays tracked)
+1_3_pyinstrument_profiling/images/
