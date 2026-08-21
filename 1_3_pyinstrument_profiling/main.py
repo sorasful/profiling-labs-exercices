@@ -11,7 +11,7 @@ DATA_URL = (
     "/main/1_3_pyinstrument_profiling/assets/data.json"
 )
 IMAGES_DIR = Path(__file__).parent / "images"
-
+IMAGES_DIR.mkdir(parents=True, exist_ok=True)
 HEADERS = {"User-Agent": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10.15; rv:129.0) Gecko/20100101 Firefox/129.0"}
 
 IMG_SRC_RE = re.compile(r'<img[^>]+src="([^"]+)"')
@@ -23,8 +23,9 @@ def fetch_document(url: str) -> dict:
     return json.loads(response.text)
 
 
-def download_image(url: str, target_dir: Path) -> bool:
+def download_image(url: str, target_dir: Path = IMAGES_DIR) -> bool:
     filename = unquote(Path(urlparse(url).path).name)
+    print(f"Downloading image {filename}")
     target = target_dir / filename
     response = requests.get(url, headers=HEADERS, timeout=60)
     if response.status_code != 200:
@@ -44,16 +45,12 @@ def main() -> int:
     image_urls = IMG_SRC_RE.findall(content)
     print(f"[{title}] found {len(image_urls)} image links, downloading…")
 
-    target_dir = IMAGES_DIR / title.replace(" ", "_")
-    target_dir.mkdir(parents=True, exist_ok=True)
-
     downloaded = 0
     for i, image_url in enumerate(image_urls, 1):
-        if download_image(image_url, target_dir):
+        if download_image(image_url):
             downloaded += 1
-        print(f"[{title}] {i}/{len(image_urls)} images done")
 
-    print(f"Done: {downloaded} images saved in {target_dir}")
+    print(f"Done: {downloaded} images saved")
     return 0
 
 
